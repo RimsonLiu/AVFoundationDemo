@@ -1,20 +1,16 @@
 PODS:
-  - ELCImagePickerController (0.2.0)
   - Masonry (1.1.0)
 
 DEPENDENCIES:
-  - ELCImagePickerController
   - Masonry
 
 SPEC REPOS:
   trunk:
-    - ELCImagePickerController
     - Masonry
 
 SPEC CHECKSUMS:
-  ELCImagePickerController: b1b7084434a7d49f2cfc916bde1f3ba353d38de9
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
 
-PODFILE CHECKSUM: 20ed57aba95b670e9b0e86c68204e0287d46cdee
+PODFILE CHECKSUM: cbef0ea12dc72932b8f8c74f22d8bb1e0fea69dd
 
 COCOAPODS: 1.8.3
