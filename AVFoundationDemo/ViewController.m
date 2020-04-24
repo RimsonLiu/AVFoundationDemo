@@ -7,9 +7,15 @@
 //
 
 #import "ViewController.h"
-#import <Masonry.h>
 
-@interface ViewController ()
+#import <Masonry.h>
+#import <RITLPhotos.h>
+
+@interface ViewController ()  <RITLPhotosViewControllerDelegate>
+
+@property (nonatomic, assign) CGSize assetSize;
+@property (nonatomic, strong) NSMutableArray <UIImage *> *assets;
+@property (nonatomic, strong) NSMutableArray <NSString *> *savedAssetIds;
 
 @end
 
@@ -19,6 +25,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     [self initView];
+    self.assetSize = CGSizeMake(self.view.frame.size.width / 2, self.view.frame.size.height / 2);
 }
 
 - (void)initView {
@@ -39,21 +46,23 @@
 #pragma mark - Action
 
 - (void)choosePhoto {
-    ELCImagePickerController *imagePickerController = [[ELCImagePickerController alloc] initImagePicker];
-    imagePickerController.maximumImagesCount = INFINITY;
-    imagePickerController.returnsImage = YES;
-    imagePickerController.onOrder = YES;
-    imagePickerController.imagePickerDelegate = self;
-    imagePickerController.modalPresentationStyle = UIModalPresentationFullScreen;
-    [self presentViewController:imagePickerController animated:YES completion:nil];
+    RITLPhotosViewController *photosViewController = RITLPhotosViewController.photosViewController;
+    photosViewController.configuration.maxCount = 9;
+    photosViewController.configuration.containVideo = NO;
+    
+    photosViewController.photo_delegate = self;
+    photosViewController.thumbnailSize = self.assetSize;
+    photosViewController.defaultIdentifers = self.savedAssetIds;
+    [self presentViewController:photosViewController animated:YES completion:nil];
 }
 
-#pragma mark - ELCImagePickerControllerDelegate
+- (void)refresh {
+}
 
+#pragma mark - RITLPhotosViewControllerDelegate
 
-
-- (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker {
-    [self dismissViewControllerAnimated:YES completion:nil];
+- (void)photosViewController:(UIViewController *)viewController assets:(NSArray<PHAsset *> *)assets {
+    NSLog(@"");
 }
 
 @end
