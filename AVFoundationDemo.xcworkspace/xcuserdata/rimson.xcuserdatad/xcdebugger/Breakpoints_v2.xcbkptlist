@@ -23,15 +23,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "3394659C-9FDF-4072-9C06-39543CA46439"
+            uuid = "86F6A04E-1687-43EC-A829-1FD166D8E69D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "AVFoundationDemo/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "65"
-            endingLineNumber = "65"
+            startingLineNumber = "97"
+            endingLineNumber = "97"
             landmarkName = "-photosViewController:assets:"
             landmarkType = "7">
          </BreakpointContent>
