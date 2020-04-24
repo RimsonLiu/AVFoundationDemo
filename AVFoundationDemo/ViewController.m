@@ -80,21 +80,18 @@
 #pragma mark - RITLPhotosViewControllerDelegate
 
 - (void)photosViewController:(UIViewController *)viewController assets:(NSArray<PHAsset *> *)assets {
-    
     if (assets[0]) {
         self.assetSize = [self sizeFromPHAsset:assets[0]];
     }
-    
     if (!self.imageArray) {
         self.imageArray = [[NSMutableArray alloc] init];
     }
-
+    [self.imageArray removeAllObjects];
     for (int i = 0; i < assets.count; i++) {
         UIImage *image = [self imageFromPHAsset:assets[i]];
         image = [self newImageWithImage:image toSize:self.assetSize];
         [self.imageArray addObject:image];
     }
-    NSLog(@"");
 }
 
 #pragma mark - AVFoundation
@@ -105,22 +102,29 @@
     self.mVideoPath = videoPath;
     NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
     
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:videoPath]) {
+        NSError *error = nil;
+        [fileManager removeItemAtURL:videoURL error:&error];
+    }
+    
     NSError *error = nil;
     AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:videoURL fileType:AVFileTypeQuickTimeMovie error:&error];
     NSParameterAssert(videoWriter);
     
     CGSize size = self.assetSize;
-    NSDictionary *outputSettings = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   AVVideoCodecTypeH264, AVVideoCodecKey,
-                                    [NSNumber numberWithInt:size.width], AVVideoWidthKey,
-                                    [NSNumber numberWithInt:size.height], AVVideoHeightKey,
-                                    nil];
+    
+    NSMutableDictionary *outputSettings = [[NSMutableDictionary alloc] init];
+    [outputSettings setObject:AVVideoCodecTypeH264 forKey:AVVideoCodecKey];
+    [outputSettings setObject:@(size.width) forKey:AVVideoWidthKey];
+    [outputSettings setObject:@(size.height) forKey:AVVideoHeightKey]
+    ;
     AVAssetWriterInput *writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSettings];
     
     NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
-    [attributes setObject:[NSNumber numberWithUnsignedInt:kCVPixelFormatType_32RGBA] forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey];
-    [attributes setObject:[NSNumber numberWithUnsignedInt:size.width] forKey:(NSString*)kCVPixelBufferWidthKey];
-    [attributes setObject:[NSNumber numberWithUnsignedInt:size.height] forKey:(NSString*)kCVPixelBufferHeightKey];
+    [attributes setObject:@(kCVPixelFormatType_32RGBA) forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey];
+    [attributes setObject:@(size.width) forKey:(NSString*)kCVPixelBufferWidthKey];
+    [attributes setObject:@(size.height) forKey:(NSString*)kCVPixelBufferHeightKey];
     
     AVAssetWriterInputPixelBufferAdaptor *adaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:writerInput sourcePixelBufferAttributes:attributes];
     
@@ -141,35 +145,30 @@
         CFRelease(buffer);
     }
     
-    [NSThread sleepForTimeInterval:0.05];
+    if (self.imageArray.count == 1) {
+        CMTime presentTime = CMTimeMake(1, 1);
+        [adaptor appendPixelBuffer:buffer withPresentationTime:presentTime];
+    }
     
-    int fps = 1;
     
-    int i = 0;
-    for (UIImage *imgFrame in self.imageArray) {
-      if (adaptor.assetWriterInput.readyForMoreMediaData) {
-        i++;
-        CMTime frameTime = CMTimeMake(5, fps);
-        CMTime lastTime = CMTimeMake(i, fps);
-        CMTime presentTime = CMTimeAdd(lastTime, frameTime);
+    int timescale = 1;
+    for (int i = 1; i < self.imageArray.count; i++) {
+        if (adaptor.assetWriterInput.readyForMoreMediaData) {
+            UIImage *imgFrame = self.imageArray[i];
+            buffer = [self pixelBufferRefFromCGImage:[imgFrame CGImage] size:size];
+            
+            CMTime presentTime = CMTimeMake(i, timescale);
 
-        buffer = [self pixelBufferRefFromCGImage:[imgFrame CGImage] size:size];
-        BOOL result = [adaptor appendPixelBuffer:buffer withPresentationTime:presentTime];
-
-        if (result == NO) {
-          NSLog(@"failed to append buffer");
-          NSLog(@"The error is %@", [videoWriter error]);
+            BOOL result = [adaptor appendPixelBuffer:buffer withPresentationTime:presentTime];
+            
+            if (result == NO) {
+                NSLog(@"failed to append buffer");
+                NSLog(@"The error is %@", [videoWriter error]);
+            }
+            if(buffer) {
+                CVBufferRelease(buffer);
+            }
         }
-        if(buffer) {
-            CVBufferRelease(buffer);
-        }
-        [NSThread sleepForTimeInterval:0.05];
-      }
-      else {
-        NSLog(@"error");
-        i--;
-      }
-      [NSThread sleepForTimeInterval:0.02];
     }
     
     [writerInput markAsFinished];
