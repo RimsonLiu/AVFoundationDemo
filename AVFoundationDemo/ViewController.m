@@ -7,6 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "FileUtil.h"
+#import "MediaUtil.h"
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -70,8 +72,7 @@
 }
 
 - (void)beginMerge {
-    NSLog(@"");
-    [self videoFromImages:self.imageArray];
+    [self createVideoFromImages:self.imageArray];
 }
 
 - (void)refresh {
@@ -81,32 +82,28 @@
 
 - (void)photosViewController:(UIViewController *)viewController assets:(NSArray<PHAsset *> *)assets {
     if (assets[0]) {
-        self.assetSize = [self sizeFromPHAsset:assets[0]];
+        self.assetSize = [MediaUtil sizeFromPHAsset:assets[0]];
     }
     if (!self.imageArray) {
         self.imageArray = [[NSMutableArray alloc] init];
     }
     [self.imageArray removeAllObjects];
     for (int i = 0; i < assets.count; i++) {
-        UIImage *image = [self imageFromPHAsset:assets[i]];
-        image = [self newImageWithImage:image toSize:self.assetSize];
+        UIImage *image = [MediaUtil imageFromPHAsset:assets[i] inSize:self.assetSize];
+        image = [MediaUtil imageResizedFrom:image toSize:self.assetSize];
         [self.imageArray addObject:image];
     }
 }
 
 #pragma mark - AVFoundation
 
-- (void)videoFromImages:(NSArray *)images {
+- (void)createVideoFromImages:(NSArray *)images {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *videoPath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", @"test"]];
     self.mVideoPath = videoPath;
     NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
     
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:videoPath]) {
-        NSError *error = nil;
-        [fileManager removeItemAtURL:videoURL error:&error];
-    }
+    [FileUtil deleteFileIfExistsAt:videoPath];
     
     NSError *error = nil;
     AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:videoURL fileType:AVFileTypeQuickTimeMovie error:&error];
@@ -137,25 +134,28 @@
     [videoWriter startWriting];
     [videoWriter startSessionAtSourceTime:kCMTimeZero];
     
+    // 首帧缓存
     UIImage *firstImage = self.imageArray[0];
-    CVPixelBufferRef buffer = [self pixelBufferRefFromCGImage:[firstImage CGImage] size:size];
+    CVPixelBufferRef buffer = [MediaUtil pixelBufferRefFromCGImage:[firstImage CGImage] inSize:size];
     [adaptor appendPixelBuffer:buffer withPresentationTime:kCMTimeZero];
     
     if (buffer) {
         CFRelease(buffer);
     }
     
+    // 单图逻辑
     if (self.imageArray.count == 1) {
-        CMTime presentTime = CMTimeMake(1, 1);
+        // timescale = 2 ?
+        CMTime presentTime = CMTimeMake(1, 2);
         [adaptor appendPixelBuffer:buffer withPresentationTime:presentTime];
     }
     
-    
+    // 多图逻辑
     int timescale = 1;
     for (int i = 1; i < self.imageArray.count; i++) {
         if (adaptor.assetWriterInput.readyForMoreMediaData) {
             UIImage *imgFrame = self.imageArray[i];
-            buffer = [self pixelBufferRefFromCGImage:[imgFrame CGImage] size:size];
+            buffer = [MediaUtil pixelBufferRefFromCGImage:[imgFrame CGImage] inSize:size];
             
             CMTime presentTime = CMTimeMake(i, timescale);
 
@@ -177,62 +177,6 @@
     }];
     
     CVPixelBufferPoolRelease(adaptor.pixelBufferPool);
-}
-
-#pragma mark - ImageProcess
-
-- (UIImage *)newImageWithImage:(UIImage *)image toSize:(CGSize)newSize {
-    UIGraphicsBeginImageContext(newSize);
-    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return newImage;
-}
-
-- (CGSize)sizeFromPHAsset:(PHAsset *)asset {
-    CGSize size = CGSizeMake(asset.pixelWidth, asset.pixelHeight);
-    return size;
-}
-
-- (UIImage *)imageFromPHAsset:(PHAsset *)asset {
-    PHImageManager *manager = [PHImageManager defaultManager];
-    PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
-    options.synchronous = YES;
-    __block UIImage *image;
-    [manager requestImageForAsset:asset targetSize:self.assetSize contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
-        image = result;
-    }];
-    return image;
-}
-
-- (CVPixelBufferRef)pixelBufferRefFromCGImage:(CGImageRef)image size:(CGSize)size {
-    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
-        [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
-        nil];
-    CVPixelBufferRef pxbuffer = NULL;
-    CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, size.width,
-        size.height, kCVPixelFormatType_32ARGB, (__bridge CFDictionaryRef) options,
-        &pxbuffer);
-    NSParameterAssert(status == kCVReturnSuccess && pxbuffer != NULL);
-
-    CVPixelBufferLockBaseAddress(pxbuffer, 0);
-    void *pxdata = CVPixelBufferGetBaseAddress(pxbuffer);
-    NSParameterAssert(pxdata != NULL);
-
-    CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(pxdata, size.width,
-        size.height, 8, 4*size.width, rgbColorSpace,
-        kCGImageAlphaNoneSkipFirst);
-    NSParameterAssert(context);
-    CGContextDrawImage(context, CGRectMake(0, 0, CGImageGetWidth(image),
-        CGImageGetHeight(image)), image);
-    CGColorSpaceRelease(rgbColorSpace);
-    CGContextRelease(context);
-
-    CVPixelBufferUnlockBaseAddress(pxbuffer, 0);
-
-    return pxbuffer;
 }
 
 @end
