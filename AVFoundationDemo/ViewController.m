@@ -139,15 +139,19 @@
     CVPixelBufferRef buffer = [MediaUtil pixelBufferRefFromCGImage:[firstImage CGImage] inSize:size];
     [adaptor appendPixelBuffer:buffer withPresentationTime:kCMTimeZero];
     
-    if (buffer) {
-        CFRelease(buffer);
-    }
+//    if (buffer) {
+//        CFRelease(buffer);
+//    }
     
     // 单图逻辑
     if (self.imageArray.count == 1) {
         // timescale = 2 ?
-        CMTime presentTime = CMTimeMake(1, 2);
+        CMTime presentTime = CMTimeMake(3, 2);
         [adaptor appendPixelBuffer:buffer withPresentationTime:presentTime];
+        
+        CGRect cropRect = CGRectMake(0, 0, CVPixelBufferGetWidth(buffer) / 2, CVPixelBufferGetHeight(buffer) / 2);
+        CVPixelBufferRef newBuffer = [self bufferByCroppingFrom:buffer toRect:cropRect];
+        [adaptor appendPixelBuffer:newBuffer withPresentationTime:presentTime];
     }
     
     // 多图逻辑
@@ -177,6 +181,25 @@
     }];
     
     CVPixelBufferPoolRelease(adaptor.pixelBufferPool);
+}
+
+- (CVPixelBufferRef)bufferByCroppingFrom:(CVPixelBufferRef)buffer toRect:(CGRect)rect {
+    CIImage *image = [CIImage imageWithCVPixelBuffer:buffer];
+    image = [image imageByCroppingToRect:rect];
+    
+    CVPixelBufferRef output = NULL;
+    CVPixelBufferCreate(nil,
+                        CGRectGetWidth(image.extent),
+                        CGRectGetHeight(image.extent),
+                        CVPixelBufferGetPixelFormatType(buffer),
+                        nil,
+                        &output);
+    
+    if (output != NULL) {
+        [[CIContext context] render:image toCVPixelBuffer:output];
+    }
+    
+    return output;
 }
 
 @end
