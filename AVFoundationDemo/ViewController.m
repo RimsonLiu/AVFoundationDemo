@@ -72,7 +72,8 @@
 }
 
 - (void)beginMerge {
-    [self createVideoFromImages:self.imageArray];
+//    [self createVideoByBufferFromImages:self.imageArray];
+    [self createVideoByLayerFromImages:self.imageArray];
 }
 
 - (void)refresh {
@@ -97,7 +98,73 @@
 
 #pragma mark - AVFoundation
 
-- (void)createVideoFromImages:(NSArray *)images {
+- (void)createVideoByLayerFromImages:(NSArray *)images {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *videoPath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", @"test"]];
+    NSString *tempPath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", @"temp"]];
+    self.mVideoPath = videoPath;
+    
+    [FileUtil deleteFileIfExistsAt:videoPath];
+    [FileUtil createEmptyVideoInSize:self.assetSize at:tempPath withCompletion:^{
+        // 获取视频资源
+        NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
+        AVAsset *tempAsset = [AVAsset assetWithURL:tempURL];
+        CMTime durationTime = [tempAsset duration];
+        // 创建自定义合成对象：可变组件
+        AVMutableComposition *composition = [AVMutableComposition composition];
+        
+        // 创建资源数据，即轨道
+        AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+        AVAssetTrack *assetTrack = [[tempAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+        videoTrack.preferredTransform = assetTrack.preferredTransform;
+        [videoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, durationTime)
+                                  ofTrack:assetTrack
+                                   atTime:kCMTimeZero
+                                    error:nil];
+        
+        // 创建视频应用层的指令，用于管理 layer
+        AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack: videoTrack];
+        [layerInstruction setTransform:assetTrack.preferredTransform atTime:kCMTimeZero];
+        
+        // 创建视频组件的指令，用于管理应用层
+        AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+        instruction.timeRange = CMTimeRangeMake(kCMTimeZero, durationTime);
+        instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
+        
+        // 创建视频组件，设置视频属性，并管理视频组件的指令
+        AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
+        videoComposition.renderSize = self.assetSize;
+        videoComposition.instructions = [NSArray arrayWithObject:instruction];
+        videoComposition.frameDuration = CMTimeMake(1, 30);
+        
+        // 插入图片
+        CALayer *animLayer = [CALayer layer];
+        animLayer.frame = CGRectMake(0, 0, self.assetSize.width, self.assetSize.height);
+        UIImage *firstImage = self.imageArray[0];
+        animLayer.contents = (__bridge id _Nullable)(firstImage.CGImage);
+        
+        CALayer *parentLayer = [CALayer layer];
+        CALayer *videoLayer = [CALayer layer];
+        parentLayer.frame = CGRectMake(0, 0, self.assetSize.width, self.assetSize.height);
+        videoLayer.frame = CGRectMake(0, 0, self.assetSize.width, self.assetSize.height);
+        
+        [parentLayer addSublayer:animLayer];
+        [parentLayer addSublayer:videoLayer];
+        
+        videoComposition.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
+
+        // NOTICE:presetName
+        AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:composition presetName:AVAssetExportPresetPassthrough];
+        exporter.videoComposition = videoComposition;
+        exporter.outputURL = [NSURL fileURLWithPath:videoPath];
+        exporter.outputFileType = AVFileTypeQuickTimeMovie;
+        [exporter exportAsynchronouslyWithCompletionHandler:^{
+            NSLog(@"AVAssetExportSession Error %@", exporter.error);
+        }];
+    }];
+}
+
+- (void)createVideoByBufferFromImages:(NSArray *)images {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *videoPath = [[paths objectAtIndex:0]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", @"test"]];
     self.mVideoPath = videoPath;
@@ -114,8 +181,8 @@
     NSMutableDictionary *outputSettings = [[NSMutableDictionary alloc] init];
     [outputSettings setObject:AVVideoCodecTypeH264 forKey:AVVideoCodecKey];
     [outputSettings setObject:@(size.width) forKey:AVVideoWidthKey];
-    [outputSettings setObject:@(size.height) forKey:AVVideoHeightKey]
-    ;
+    [outputSettings setObject:@(size.height) forKey:AVVideoHeightKey];
+    
     AVAssetWriterInput *writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSettings];
     
     NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
@@ -155,6 +222,11 @@
     }
     
     // 多图逻辑
+    if (self.imageArray.count > 1) {
+        // 首张 1.38s show
+//        CMTime showTime = CMTimeMake(138, 100);
+        
+    }
     int timescale = 1;
     for (int i = 1; i < self.imageArray.count; i++) {
         if (adaptor.assetWriterInput.readyForMoreMediaData) {
@@ -162,7 +234,7 @@
             buffer = [MediaUtil pixelBufferRefFromCGImage:[imgFrame CGImage] inSize:size];
             
             CMTime presentTime = CMTimeMake(i, timescale);
-
+            
             BOOL result = [adaptor appendPixelBuffer:buffer withPresentationTime:presentTime];
             
             if (result == NO) {
@@ -171,6 +243,7 @@
             }
             if(buffer) {
                 CVBufferRelease(buffer);
+                
             }
         }
     }

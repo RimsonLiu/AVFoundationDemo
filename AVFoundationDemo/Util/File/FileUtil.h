@@ -7,13 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import "MediaUtil.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FileUtil : NSObject
 
 + (void)deleteFileIfExistsAt:(NSString *)fileName;
-
++ (void)createEmptyVideoInSize:(CGSize)frameSize at:(NSString *)tempPath withCompletion:(void (^)(void))completion;
 @end
 
 NS_ASSUME_NONNULL_END
