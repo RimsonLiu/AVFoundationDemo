@@ -11,6 +11,7 @@
 #import "MediaUtil.h"
 
 #import <AVFoundation/AVFoundation.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 
 #import <Masonry.h>
 #import <RITLPhotos.h>
@@ -142,14 +143,15 @@
         animLayer.frame = CGRectMake(0, 0, self.assetSize.width, self.assetSize.height);
         UIImage *firstImage = self.imageArray[0];
         animLayer.contents = (__bridge id _Nullable)(firstImage.CGImage);
+//        animLayer.beginTime = AVCoreAnimationBeginTimeAtZero;
         
         CALayer *parentLayer = [CALayer layer];
         CALayer *videoLayer = [CALayer layer];
         parentLayer.frame = CGRectMake(0, 0, self.assetSize.width, self.assetSize.height);
         videoLayer.frame = CGRectMake(0, 0, self.assetSize.width, self.assetSize.height);
         
-        [parentLayer addSublayer:animLayer];
         [parentLayer addSublayer:videoLayer];
+        [parentLayer addSublayer:animLayer];
         
         videoComposition.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
 
@@ -160,6 +162,16 @@
         exporter.outputFileType = AVFileTypeQuickTimeMovie;
         [exporter exportAsynchronouslyWithCompletionHandler:^{
             NSLog(@"AVAssetExportSession Error %@", exporter.error);
+            
+            ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+            [library writeVideoAtPathToSavedPhotosAlbum:[NSURL fileURLWithPath:videoPath] completionBlock:^(NSURL *assetURL, NSError *error) {
+                 if (error) {
+                    NSLog(@"Error");
+                 } else {
+                    NSLog(@"Success");
+                 }
+
+            }];
         }];
     }];
 }
