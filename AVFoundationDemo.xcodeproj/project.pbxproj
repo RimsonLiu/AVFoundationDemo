@@ -17,9 +17,9 @@
 		D317CF0724517CDD0052FB4E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF0624517CDD0052FB4E /* main.m */; };
 		D317CF1124517CDD0052FB4E /* AVFoundationDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF1024517CDD0052FB4E /* AVFoundationDemoTests.m */; };
 		D317CF1C24517CDD0052FB4E /* AVFoundationDemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF1B24517CDD0052FB4E /* AVFoundationDemoUITests.m */; };
-		D317CF732451A9770052FB4E /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D317CF722451A9770052FB4E /* AssetsLibrary.framework */; };
 		D317CF7824548E830052FB4E /* FileUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF7724548E830052FB4E /* FileUtil.m */; };
 		D317CF7C245491E90052FB4E /* MediaUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF7B245491E90052FB4E /* MediaUtil.m */; };
+		D3BAF5FB2473915300E46E90 /* CAAnimationUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D3BAF5FA2473915300E46E90 /* CAAnimationUtil.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +66,8 @@
 		D317CF7724548E830052FB4E /* FileUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileUtil.m; sourceTree = "<group>"; };
 		D317CF7A245491E90052FB4E /* MediaUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MediaUtil.h; sourceTree = "<group>"; };
 		D317CF7B245491E90052FB4E /* MediaUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MediaUtil.m; sourceTree = "<group>"; };
+		D3BAF5F92473915300E46E90 /* CAAnimationUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CAAnimationUtil.h; sourceTree = "<group>"; };
+		D3BAF5FA2473915300E46E90 /* CAAnimationUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CAAnimationUtil.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,7 +75,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D317CF732451A9770052FB4E /* AssetsLibrary.framework in Frameworks */,
 				CA4F21DC1E1B17F74ED1B52A /* libPods-AVFoundationDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -203,6 +204,8 @@
 			children = (
 				D317CF7A245491E90052FB4E /* MediaUtil.h */,
 				D317CF7B245491E90052FB4E /* MediaUtil.m */,
+				D3BAF5F92473915300E46E90 /* CAAnimationUtil.h */,
+				D3BAF5FA2473915300E46E90 /* CAAnimationUtil.m */,
 			);
 			path = Media;
 			sourceTree = "<group>";
@@ -384,6 +387,7 @@
 				D317CF7824548E830052FB4E /* FileUtil.m in Sources */,
 				D317CEFC24517CDB0052FB4E /* ViewController.m in Sources */,
 				D317CF7C245491E90052FB4E /* MediaUtil.m in Sources */,
+				D3BAF5FB2473915300E46E90 /* CAAnimationUtil.m in Sources */,
 				D317CEF624517CDB0052FB4E /* AppDelegate.m in Sources */,
 				D317CF0724517CDD0052FB4E /* main.m in Sources */,
 				D317CEF924517CDB0052FB4E /* SceneDelegate.m in Sources */,
@@ -491,7 +495,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -543,7 +547,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -563,7 +567,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = rimson.AVFoundationDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rimson.AVFoundationDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -581,7 +585,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = rimson.AVFoundationDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rimson.AVFoundationDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -34,33 +34,35 @@
     return size;
 }
 
-+ (CVPixelBufferRef)pixelBufferRefFromCGImage:(CGImageRef)image inSize:(CGSize)size {
++ (CVPixelBufferRef)pixelBufferRefFromCGImage:(CGImageRef)image inSize:(CGSize)imageSize {
+    CGFloat width = CGImageGetWidth(image) / [UIScreen mainScreen].scale;
+    CGFloat height = CGImageGetHeight(image) / [UIScreen mainScreen].scale;
     NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
-        [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
-        nil];
+                             [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
+                             [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
+                             nil];
     CVPixelBufferRef pxbuffer = NULL;
-    CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, size.width,
-        size.height, kCVPixelFormatType_32ARGB, (__bridge CFDictionaryRef) options,
-        &pxbuffer);
-    NSParameterAssert(status == kCVReturnSuccess && pxbuffer != NULL);
-
+    
+    CVPixelBufferCreate(kCFAllocatorDefault, imageSize.width,
+                        imageSize.height, kCVPixelFormatType_32ARGB, (__bridge CFDictionaryRef) options,
+                        &pxbuffer);
     CVPixelBufferLockBaseAddress(pxbuffer, 0);
     void *pxdata = CVPixelBufferGetBaseAddress(pxbuffer);
-    NSParameterAssert(pxdata != NULL);
-
+    
     CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(pxdata, size.width,
-        size.height, 8, 4 * size.width, rgbColorSpace,
-        kCGImageAlphaNoneSkipFirst);
-    NSParameterAssert(context);
-    CGContextDrawImage(context, CGRectMake(0, 0, CGImageGetWidth(image),
-        CGImageGetHeight(image)), image);
+    CGContextRef context = CGBitmapContextCreate(pxdata, imageSize.width,
+                                                 imageSize.height, 8, CVPixelBufferGetBytesPerRow(pxbuffer), rgbColorSpace,
+                                                 kCGImageAlphaNoneSkipFirst);
+    CGContextConcatCTM(context, CGAffineTransformMakeRotation(0));
+    CGContextDrawImage(context, CGRectMake(0 + (imageSize.width-width)/2,
+                                           (imageSize.height-height)/2,
+                                           width,
+                                           height), image);
     CGColorSpaceRelease(rgbColorSpace);
     CGContextRelease(context);
-
+    
     CVPixelBufferUnlockBaseAddress(pxbuffer, 0);
-
+    
     return pxbuffer;
 }
 

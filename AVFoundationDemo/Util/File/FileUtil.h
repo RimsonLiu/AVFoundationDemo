@@ -15,8 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FileUtil : NSObject
 
-+ (void)deleteFileIfExistsAt:(NSString *)fileName;
-+ (void)createEmptyVideoInSize:(CGSize)frameSize at:(NSString *)tempPath withCompletion:(void (^)(void))completion;
++ (void)deleteFileIfExistsAtPath:(NSString *)fileName;
++ (void)createEmptyVideoInSize:(CGSize)frameSize
+                            at:(NSString *)tempPath
+                withCompletion:(nullable void (^)(void))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END
