@@ -155,9 +155,11 @@
                 NSLog(@"AVAssetExportSession Error %@", exporter.error);
             }
             UISaveVideoAtPathToSavedPhotosAlbum(url.path, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
-            if (completion) {
-                completion();
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) {
+                    completion();
+                }                
+            });
         }];
     });
 }

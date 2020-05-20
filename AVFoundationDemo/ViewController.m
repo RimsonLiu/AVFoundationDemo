@@ -27,6 +27,8 @@
 @property (nonatomic, strong) AVPlayerItem *playerItem;
 @property (nonatomic, strong) AVPlayerLayer *playerLayer;
 
+@property (nonatomic, strong) UIView *loadingView;
+
 @end
 
 @implementation ViewController
@@ -47,6 +49,8 @@
 }
 
 - (void)initView {
+    self.view.backgroundColor = [UIColor blackColor];
+    
     UIButton *choosePhotoButton = [[UIButton alloc] init];
     [choosePhotoButton setTitle:@"选择图片" forState:UIControlStateNormal];
     [choosePhotoButton setBackgroundColor:[UIColor blackColor]];
@@ -57,7 +61,29 @@
         make.centerX.equalTo(self.view);
         make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop).offset(20);
     }];
-    
+}
+
+- (void)showLoadingView {
+    if (!self.loadingView) {
+        UIView *loadingView = [[UIView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width / 2 - 75, self.view.bounds.size.height / 2 - 25, 150, 50)];
+        loadingView.backgroundColor = [UIColor whiteColor];
+        loadingView.alpha = 0.8;
+        loadingView.layer.cornerRadius = 10;
+        
+        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        indicator.frame = CGRectMake(0, 0, 50, 50);
+        [indicator startAnimating];
+        
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 150, 50)];
+        label.textColor = [UIColor grayColor];
+        label.text = @"正在合成";
+        
+        [loadingView addSubview:indicator];
+        [loadingView addSubview:label];
+        
+        self.loadingView = loadingView;
+    }
+    [self.view addSubview:self.loadingView];
 }
 
 #pragma mark - Action
@@ -74,8 +100,12 @@
 }
 
 - (void)beginMerge {
+    [self showLoadingView];
+    __weak typeof(self) weakSelf = self;
     [MediaUtil createVideoFromImages:self.imageArray size:self.assetSize completion:^{
-        [self initAVPlayer];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf.loadingView removeFromSuperview];
+        [strongSelf initAVPlayer];
     }];
 }
 
