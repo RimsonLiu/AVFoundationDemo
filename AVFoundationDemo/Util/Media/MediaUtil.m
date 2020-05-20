@@ -7,6 +7,8 @@
 //
 
 #import "MediaUtil.h"
+#import "FileUtil.h"
+#import "CAAnimationUtil.h"
 
 @implementation MediaUtil
 
@@ -64,6 +66,115 @@
     CVPixelBufferUnlockBaseAddress(pxbuffer, 0);
     
     return pxbuffer;
+}
+
++ (void)createVideoFromImages:(NSArray<UIImage *> *)images size:(CGSize)size completion:(void (^)(void))completion {
+    NSString *videoPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"test.mov"];
+    NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.mov"];
+    
+    dispatch_queue_t composeQueue = dispatch_queue_create("com.rimson.video.compose", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_async(composeQueue, ^{
+        [FileUtil createEmptyVideoInSize:size at:tempPath withCompletion:^{
+            [self exportPhotoVideoWithImages:images url:[NSURL fileURLWithPath:videoPath] completion:completion];
+        }];
+    });
+}
+
++ (void)exportPhotoVideoWithImages:(NSArray<UIImage *> *)images url:(NSURL *)url completion:(void (^)(void))completion {
+    NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.mov"];
+    
+    // 获取视频资源
+    NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
+    AVAsset *tempAsset = [AVAsset assetWithURL:tempURL];
+    CMTime durationTime = [tempAsset duration];
+    // 创建自定义合成对象：可变组件
+    AVMutableComposition *composition = [AVMutableComposition composition];
+
+    // 创建资源数据，即轨道
+    AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    AVAssetTrack *assetTrack = [[tempAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    CGSize naturalSize = assetTrack.naturalSize;
+
+    [videoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, durationTime)
+                        ofTrack:assetTrack
+                         atTime:kCMTimeZero
+                          error:nil];
+
+    // 创建视频应用层的指令，用于管理 layer
+    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack: assetTrack];
+
+    // 创建视频组件的指令，用于管理应用层
+    AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    instruction.timeRange = CMTimeRangeMake(kCMTimeZero, durationTime);
+    instruction.layerInstructions = @[layerInstruction];
+
+    // 创建 Layer，插入图片，注意 Layer 关系
+    CALayer *videoLayer = [CALayer layer];
+    videoLayer.frame = CGRectMake(0, 0, naturalSize.width, naturalSize.height);
+
+    CALayer *animationLayer = [CAAnimationUtil createAnimationLayerWithPhotos:images
+                                                                         size:naturalSize
+                                                                   videoLayer:videoLayer];
+    
+//    [videoLayer addSublayer:animationLayer];
+//    [animationLayer addSublayer:videoLayer];
+    
+    // 创建视频组件，设置视频属性，并管理视频组件的指令
+    AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
+    videoComposition.renderSize = naturalSize;
+    videoComposition.instructions = @[instruction];
+    videoComposition.frameDuration = CMTimeMake(1, 30);
+    videoComposition.animationTool = [AVVideoCompositionCoreAnimationTool
+                                      videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer
+                                      inLayer:animationLayer];
+    
+    // NOTICE: Do not use AVAssetExportPresetPassthrough !!!
+    AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:composition presetName:AVAssetExportPresetHighestQuality];
+    exporter.videoComposition = videoComposition;
+    exporter.outputURL = url;
+    exporter.outputFileType = AVFileTypeQuickTimeMovie;
+    exporter.shouldOptimizeForNetworkUse = YES;
+    
+    dispatch_queue_t exportQueue = dispatch_queue_create("com.rimson.video.export", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_async(exportQueue, ^{
+        [FileUtil deleteFileIfExistsAtPath:url.path];
+        [exporter exportAsynchronouslyWithCompletionHandler:^{
+            if (exporter.error) {
+                NSLog(@"AVAssetExportSession Error %@", exporter.error);
+            }
+            UISaveVideoAtPathToSavedPhotosAlbum(url.path, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
+            if (completion) {
+                completion();
+            }
+        }];
+    });
+}
+
++ (void)video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+    if (error) {
+        NSLog(@"保存视频失败%@", error);
+    } else {
+        NSLog(@"保存视频成功");
+    }
+}
+
+- (CVPixelBufferRef)bufferByCroppingFrom:(CVPixelBufferRef)buffer toRect:(CGRect)rect {
+    CIImage *image = [CIImage imageWithCVPixelBuffer:buffer];
+    image = [image imageByCroppingToRect:rect];
+    
+    CVPixelBufferRef output = NULL;
+    CVPixelBufferCreate(nil,
+                        CGRectGetWidth(image.extent),
+                        CGRectGetHeight(image.extent),
+                        CVPixelBufferGetPixelFormatType(buffer),
+                        nil,
+                        &output);
+    
+    if (output != NULL) {
+        [[CIContext context] render:image toCVPixelBuffer:output];
+    }
+    
+    return output;
 }
 
 @end

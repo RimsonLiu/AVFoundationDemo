@@ -62,15 +62,7 @@
     
     CMTime startTime = CMTimeMake(0,30);
     CMTime endTime   = CMTimeMake(450, 30);
-    
     [videoWriter startSessionAtSourceTime:startTime];
-    
-    // 插入首帧
-    [self appendToAdapter:videoAdaptor
-              pixelBuffer:endImageRef
-                   atTime:startTime
-                withInput:videoInput
-          withMovieWriter:videoWriter];
     
     BOOL success = [self appendToAdapter:videoAdaptor
                              pixelBuffer:endImageRef

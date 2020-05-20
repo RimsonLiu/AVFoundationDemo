@@ -7,10 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CAAnimationUtil : NSObject
+
++ (CALayer *)createAnimationLayerWithPhotos:(NSArray<UIImage *> *)images
+                                       size:(CGSize)size
+                                 videoLayer:(CALayer *)videoLayer;
 
 @end
 

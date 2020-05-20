@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (CVPixelBufferRef)pixelBufferRefFromCGImage:(CGImageRef)image inSize:(CGSize)size;
 
++ (void)createVideoFromImages:(NSArray<UIImage *> *)images size:(CGSize)size completion:(void (^)(void))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END
