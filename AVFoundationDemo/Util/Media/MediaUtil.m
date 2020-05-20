@@ -68,20 +68,32 @@
     return pxbuffer;
 }
 
+#pragma mark - file path
+
++ (NSString *)getTempBlankVideoPath {
+    return [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.mov"];;
+}
+
++ (NSString *)getVideoPath {
+    return [NSTemporaryDirectory() stringByAppendingPathComponent:@"test.mov"];;
+}
+
+#pragma mark - create video
+
 + (void)createVideoFromImages:(NSArray<UIImage *> *)images size:(CGSize)size completion:(void (^)(void))completion {
-    NSString *videoPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"test.mov"];
-    NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.mov"];
+    NSString *videoPath = [self getVideoPath];
+    NSString *tempPath = [self getTempBlankVideoPath];
     
     dispatch_queue_t composeQueue = dispatch_queue_create("com.rimson.video.compose", DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(composeQueue, ^{
-        [FileUtil createEmptyVideoInSize:size at:tempPath withCompletion:^{
+        [self createEmptyVideoInSize:size at:tempPath withCompletion:^{
             [self exportPhotoVideoWithImages:images url:[NSURL fileURLWithPath:videoPath] completion:completion];
         }];
     });
 }
 
 + (void)exportPhotoVideoWithImages:(NSArray<UIImage *> *)images url:(NSURL *)url completion:(void (^)(void))completion {
-    NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"temp.mov"];
+    NSString *tempPath = [self getTempBlankVideoPath];
     
     // 获取视频资源
     NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
@@ -158,23 +170,102 @@
     }
 }
 
-- (CVPixelBufferRef)bufferByCroppingFrom:(CVPixelBufferRef)buffer toRect:(CGRect)rect {
-    CIImage *image = [CIImage imageWithCVPixelBuffer:buffer];
-    image = [image imageByCroppingToRect:rect];
-    
-    CVPixelBufferRef output = NULL;
-    CVPixelBufferCreate(nil,
-                        CGRectGetWidth(image.extent),
-                        CGRectGetHeight(image.extent),
-                        CVPixelBufferGetPixelFormatType(buffer),
-                        nil,
-                        &output);
-    
-    if (output != NULL) {
-        [[CIContext context] render:image toCVPixelBuffer:output];
+#pragma mark - blank video
+
++ (void)createEmptyVideoInSize:(CGSize)frameSize at:(NSString *)tempPath withCompletion:(void (^)(void))completion {
+//    [FileUtil deleteFileIfExistsAtPath:tempPath];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:tempPath]) {
+        if (completion) {
+            completion();
+        }
+        return;
     }
     
-    return output;
+    NSError *error = nil;
+    
+    NSDictionary *videoSettings = @{AVVideoCodecKey: AVVideoCodecTypeH264,
+                                    AVVideoWidthKey: @(frameSize.width),
+                                    AVVideoHeightKey: @(frameSize.height),
+                                    };
+    AVAssetWriterInput *videoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
+                                                                         outputSettings:videoSettings];
+    
+    AVAssetWriterInputPixelBufferAdaptor *videoAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:videoInput
+                                                                                                                          sourcePixelBufferAttributes:nil];
+    
+    AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:tempPath]
+                                                           fileType:AVFileTypeMPEG4
+                                                              error:&error];
+    
+    if ([videoWriter canAddInput:videoInput]) {
+        [videoWriter addInput:videoInput];
+    }
+    
+    // Start a session:
+    [videoWriter startWriting];
+    
+    CGRect rect = CGRectMake(0, 0, frameSize.width, frameSize.height);
+    UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0);
+    [[UIColor redColor] setFill];
+    UIRectFill(rect);
+    UIImage *endEmptyImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    CVPixelBufferRef endImageRef = [MediaUtil pixelBufferRefFromCGImage:endEmptyImage.CGImage inSize:frameSize];
+    
+    CMTime startTime = CMTimeMake(0,30);
+    CMTime endTime   = CMTimeMake(450, 30);
+    [videoWriter startSessionAtSourceTime:startTime];
+    
+    BOOL success = [self appendToAdapter:videoAdaptor
+                             pixelBuffer:endImageRef
+                                  atTime:endTime
+                               withInput:videoInput
+                         withMovieWriter:videoWriter];
+    
+    // 生成视频
+    if (success) {
+        [videoInput markAsFinished];
+        [videoWriter finishWritingWithCompletionHandler:^{
+            if (videoWriter.status != AVAssetWriterStatusCompleted) {
+                NSLog(@"Create temp video finishWritingWithCompletionHandler error: %@", error);
+                if (completion) {
+                    completion();
+                }
+            } else {
+                if (completion) {
+                    completion();
+                }
+            }
+        }];
+        CVPixelBufferPoolRelease(videoAdaptor.pixelBufferPool);
+    } else {
+        NSLog(@"Create temp video appendPixelBuffer error: %@", error);
+    }
+}
+
++ (BOOL)appendToAdapter:(AVAssetWriterInputPixelBufferAdaptor*)adaptor
+            pixelBuffer:(CVPixelBufferRef)buffer
+                 atTime:(CMTime)presentTime
+              withInput:(AVAssetWriterInput*)writerInput
+        withMovieWriter:(AVAssetWriter *)movieWriter {
+    NSTimer *foreverTimer = [NSTimer timerWithTimeInterval:INT_MAX
+                                                    target:self
+                                                  selector:@selector(description)
+                                                  userInfo:nil
+                                                   repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:foreverTimer
+                                 forMode:NSDefaultRunLoopMode];
+    
+    while (!writerInput.readyForMoreMediaData) {
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    }
+    [foreverTimer invalidate];
+    
+    BOOL isSuccess = [adaptor appendPixelBuffer:buffer withPresentationTime:presentTime];
+    
+    return isSuccess;
 }
 
 @end

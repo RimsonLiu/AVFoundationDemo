@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)createVideoFromImages:(NSArray<UIImage *> *)images size:(CGSize)size completion:(void (^)(void))completion;
 
++ (NSString *)getTempBlankVideoPath;
++ (NSString *)getVideoPath;
+
 @end
 
 NS_ASSUME_NONNULL_END

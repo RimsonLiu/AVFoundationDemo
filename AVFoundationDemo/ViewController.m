@@ -23,9 +23,21 @@
 @property (nonatomic, strong) NSMutableArray <UIImage *> *imageArray;
 @property (nonatomic, strong) NSMutableArray <NSString *> *savedAssetIds;
 
+@property (nonatomic, strong) AVPlayer *player;
+@property (nonatomic, strong) AVPlayerItem *playerItem;
+@property (nonatomic, strong) AVPlayerLayer *playerLayer;
+
 @end
 
 @implementation ViewController
+
+# pragma mark - lifecycle
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AVPlayerItemDidPlayToEndTimeNotification
+                                                  object:self.player.currentItem];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -46,17 +58,6 @@
         make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop).offset(20);
     }];
     
-    UIButton *mergeButton = [[UIButton alloc] init];
-    [mergeButton setTitle:@"开始合成" forState:UIControlStateNormal];
-    [mergeButton setBackgroundColor:[UIColor brownColor]];
-    UITapGestureRecognizer *tapMergeButton = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(beginMerge)];
-    [mergeButton addGestureRecognizer:tapMergeButton];
-    [self.view addSubview:mergeButton];
-    [mergeButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.view);
-        make.top.equalTo(choosePhotoButton.mas_bottom).offset(20);
-    }];
-    
 }
 
 #pragma mark - Action
@@ -74,8 +75,34 @@
 
 - (void)beginMerge {
     [MediaUtil createVideoFromImages:self.imageArray size:self.assetSize completion:^{
-        
+        [self initAVPlayer];
     }];
+}
+
+#pragma mark - AVPlayer
+
+- (void)initAVPlayer {
+    // 创建播放器
+    NSURL *videoURL = [NSURL fileURLWithPath:[MediaUtil getVideoPath]];
+    self.player = [AVPlayer playerWithURL:videoURL];
+    self.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(playerDidEnd:)
+                                                 name:AVPlayerItemDidPlayToEndTimeNotification
+                                               object:self.player.currentItem];
+    // 创建播放器 Layer
+    self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
+    self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    self.playerLayer.backgroundColor = (__bridge CGColorRef _Nullable)(self.view.backgroundColor);
+    self.playerLayer.frame = CGRectMake(0, 100, self.view.bounds.size.width, 600);
+    [self.view.layer addSublayer:self.playerLayer];
+    // 播放
+    [self.player play];
+}
+
+- (void)playerDidEnd:(NSNotification *)notification {
+    AVPlayerItem *playerItem = [notification object];
+    [playerItem seekToTime:kCMTimeZero completionHandler:nil];
 }
 
 #pragma mark - RITLPhotosViewControllerDelegate
@@ -93,6 +120,7 @@
         image = [MediaUtil imageResizedFrom:image toSize:self.assetSize];
         [self.imageArray addObject:image];
     }
+    [self beginMerge];
 }
 
 @end
