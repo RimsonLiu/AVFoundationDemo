@@ -19,8 +19,7 @@
 @interface ViewController ()  <RITLPhotosViewControllerDelegate>
 
 @property (nonatomic, assign) CGSize assetSize;
-@property (nonatomic, strong) NSString *mVideoPath;
-@property (nonatomic, strong) NSMutableArray <UIImage *> *imageArray;
+@property (nonatomic, strong) NSMutableArray <UIImage *> *chosenImages;
 @property (nonatomic, strong) NSMutableArray <NSString *> *savedAssetIds;
 
 @property (nonatomic, strong) AVPlayer *player;
@@ -102,7 +101,7 @@
 - (void)beginMerge {
     [self showLoadingView];
     __weak typeof(self) weakSelf = self;
-    [MediaUtil createVideoFromImages:self.imageArray size:self.assetSize completion:^{
+    [MediaUtil createVideoFromImages:self.chosenImages size:self.assetSize completion:^{
         __strong typeof(weakSelf) strongSelf = weakSelf;
         [strongSelf.loadingView removeFromSuperview];
         [strongSelf initAVPlayer];
@@ -141,14 +140,14 @@
     if (assets[0]) {
         self.assetSize = [MediaUtil sizeFromPHAsset:assets[0]];
     }
-    if (!self.imageArray) {
-        self.imageArray = [[NSMutableArray alloc] init];
+    if (!self.chosenImages) {
+        self.chosenImages = [[NSMutableArray alloc] init];
     }
-    [self.imageArray removeAllObjects];
+    [self.chosenImages removeAllObjects];
     for (int i = 0; i < assets.count; i++) {
         UIImage *image = [MediaUtil imageFromPHAsset:assets[i] inSize:self.assetSize];
         image = [MediaUtil imageResizedFrom:image toSize:self.assetSize];
-        [self.imageArray addObject:image];
+        [self.chosenImages addObject:image];
     }
     [self beginMerge];
 }
