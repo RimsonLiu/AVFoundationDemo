@@ -63,7 +63,7 @@
                         inSize:(CGSize)size {
     NSTimeInterval timeBegin = AVCoreAnimationBeginTimeAtZero;
     NSTimeInterval timeOffset = 1.68;
-    for (NSInteger i = 0; i < 10; i++) {
+    for (NSInteger i = 0; i < images.count; i++) {
         UIImage *image = images[i % images.count];
         UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
         imageView.contentMode = UIViewContentModeScaleAspectFit;

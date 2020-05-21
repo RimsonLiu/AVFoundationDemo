@@ -84,9 +84,14 @@
     NSString *videoPath = [self getVideoPath];
     NSString *tempPath = [self getTempBlankVideoPath];
     
+    NSTimeInterval duration = 15;
+    if (images.count > 1) {
+        duration = (0.15 + 0.15 + 1.38) * images.count;
+    }
+    
     dispatch_queue_t composeQueue = dispatch_queue_create("com.rimson.video.compose", DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(composeQueue, ^{
-        [self createEmptyVideoInSize:size at:tempPath withCompletion:^{
+        [self createEmptyVideoForDuration:duration inSize:size atPath:tempPath withCompletion:^{
             [self exportPhotoVideoWithImages:images url:[NSURL fileURLWithPath:videoPath] completion:completion];
         }];
     });
@@ -174,15 +179,15 @@
 
 #pragma mark - blank video
 
-+ (void)createEmptyVideoInSize:(CGSize)frameSize at:(NSString *)tempPath withCompletion:(void (^)(void))completion {
-//    [FileUtil deleteFileIfExistsAtPath:tempPath];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:tempPath]) {
-        if (completion) {
-            completion();
-        }
-        return;
-    }
++ (void)createEmptyVideoForDuration:(NSTimeInterval)seconds inSize:(CGSize)frameSize atPath:(NSString *)tempPath withCompletion:(void (^)(void))completion {
+    [FileUtil deleteFileIfExistsAtPath:tempPath];
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//    if ([fileManager fileExistsAtPath:tempPath]) {
+//        if (completion) {
+//            completion();
+//        }
+//        return;
+//    }
     
     NSError *error = nil;
     
@@ -209,16 +214,18 @@
     
     CGRect rect = CGRectMake(0, 0, frameSize.width, frameSize.height);
     UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0);
-    [[UIColor redColor] setFill];
+    [[UIColor blackColor] setFill];
     UIRectFill(rect);
     UIImage *endEmptyImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
     CVPixelBufferRef endImageRef = [MediaUtil pixelBufferRefFromCGImage:endEmptyImage.CGImage inSize:frameSize];
     
-    CMTime startTime = CMTimeMake(0,30);
-    CMTime endTime   = CMTimeMake(450, 30);
-    [videoWriter startSessionAtSourceTime:startTime];
+    if (seconds < 15) {
+        seconds = 15;
+    }
+    CMTime endTime = CMTimeMake(seconds * 30, 30);
+    [videoWriter startSessionAtSourceTime:kCMTimeZero];
     
     BOOL success = [self appendToAdapter:videoAdaptor
                              pixelBuffer:endImageRef

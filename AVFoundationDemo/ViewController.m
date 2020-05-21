@@ -47,6 +47,11 @@
     self.assetSize = CGSizeMake(self.view.frame.size.width / 2, self.view.frame.size.height / 2);
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self.player pause];
+}
+
 - (void)initView {
     self.view.backgroundColor = [UIColor blackColor];
     
@@ -89,7 +94,7 @@
 
 - (void)choosePhoto {
     RITLPhotosViewController *photosViewController = RITLPhotosViewController.photosViewController;
-    photosViewController.configuration.maxCount = 9;
+    photosViewController.configuration.maxCount = 100 ;
     photosViewController.configuration.containVideo = NO;
     
     photosViewController.photo_delegate = self;
@@ -100,11 +105,14 @@
 
 - (void)beginMerge {
     [self showLoadingView];
+    NSTimeInterval timeStart = [[NSDate date] timeIntervalSince1970];
     __weak typeof(self) weakSelf = self;
     [MediaUtil createVideoFromImages:self.chosenImages size:self.assetSize completion:^{
         __strong typeof(weakSelf) strongSelf = weakSelf;
         [strongSelf.loadingView removeFromSuperview];
         [strongSelf initAVPlayer];
+        NSTimeInterval timeEnd = [[NSDate date] timeIntervalSince1970];
+        NSLog(@"共耗时 %f", timeEnd - timeStart);
     }];
 }
 
