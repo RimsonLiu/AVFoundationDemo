@@ -11,6 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, PhotoMovieAnimationType) {
+    PhotoMovieAnimationTypeFadeShowing = 0,
+    PhotoMovieAnimationTypeFadeHiding = 1,
+    PhotoMovieAnimationTypeZooming = 2,
+};
+
 @interface CAAnimationUtil : NSObject
 
 + (CALayer *)createAnimationLayerWithPhotos:(NSArray<UIImage *> *)images
