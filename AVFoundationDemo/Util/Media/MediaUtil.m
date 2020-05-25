@@ -20,15 +20,29 @@
     return newImage;
 }
 
-+ (UIImage *)imageFromPHAsset:(PHAsset *)asset inSize:(CGSize)size {
++ (UIImage *)imageFromPHAsset:(PHAsset *)asset {
     PHImageManager *manager = [PHImageManager defaultManager];
     PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
     options.synchronous = YES;
     __block UIImage *image;
-    [manager requestImageForAsset:asset targetSize:size contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    [manager requestImageForAsset:asset targetSize:[self sizeFromPHAsset:asset] contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         image = result;
     }];
     return image;
+}
+
++ (void)appendImageFromPHAssets:(NSArray<PHAsset *> *)assets toImages:(NSMutableArray<UIImage *> *)images {
+    PHImageManager *manager = [PHImageManager defaultManager];
+    PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
+    options.synchronous = YES;
+    for (PHAsset *asset in assets) {
+        [manager requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+            UIImage *image = [UIImage imageWithData:imageData];
+            CGSize size = [self sizeFromPHAsset:asset];
+            image = [self imageResizedFrom:image toSize:size];
+            [images addObject:image];
+        }];
+    }
 }
 
 + (CGSize)sizeFromPHAsset:(PHAsset *)asset {
@@ -45,15 +59,22 @@
                              nil];
     CVPixelBufferRef pxbuffer = NULL;
     
-    CVPixelBufferCreate(kCFAllocatorDefault, imageSize.width,
-                        imageSize.height, kCVPixelFormatType_32ARGB, (__bridge CFDictionaryRef) options,
+    CVPixelBufferCreate(kCFAllocatorDefault,
+                        imageSize.width,
+                        imageSize.height,
+                        kCVPixelFormatType_32ARGB,
+                        (__bridge CFDictionaryRef) options,
                         &pxbuffer);
     CVPixelBufferLockBaseAddress(pxbuffer, 0);
     void *pxdata = CVPixelBufferGetBaseAddress(pxbuffer);
     
     CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(pxdata, imageSize.width,
-                                                 imageSize.height, 8, CVPixelBufferGetBytesPerRow(pxbuffer), rgbColorSpace,
+    CGContextRef context = CGBitmapContextCreate(pxdata,
+                                                 imageSize.width,
+                                                 imageSize.height,
+                                                 8,
+                                                 CVPixelBufferGetBytesPerRow(pxbuffer),
+                                                 rgbColorSpace,
                                                  kCGImageAlphaNoneSkipFirst);
     CGContextConcatCTM(context, CGAffineTransformMakeRotation(0));
     CGContextDrawImage(context, CGRectMake(0 + (imageSize.width-width)/2,
@@ -98,6 +119,7 @@
 }
 
 + (void)exportPhotoVideoWithImages:(NSArray<UIImage *> *)images url:(NSURL *)url completion:(void (^)(void))completion {
+    NSTimeInterval timeStart = [[NSDate date] timeIntervalSince1970];
     NSString *tempPath = [self getTempBlankVideoPath];
     
     // 获取视频资源
@@ -159,6 +181,8 @@
             if (exporter.error) {
                 NSLog(@"AVAssetExportSession Error %@", exporter.error);
             }
+            NSTimeInterval timeEnd = [[NSDate date] timeIntervalSince1970];
+            NSLog(@"合成视频耗时 %f", timeEnd - timeStart);
             UISaveVideoAtPathToSavedPhotosAlbum(url.path, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) {

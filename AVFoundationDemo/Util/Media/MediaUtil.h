@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MediaUtil : NSObject
 
 + (UIImage *)imageResizedFrom:(UIImage *)image toSize:(CGSize)newSize;
-+ (UIImage *)imageFromPHAsset:(PHAsset *)asset inSize:(CGSize)size;
++ (UIImage *)imageFromPHAsset:(PHAsset *)asset;
++ (void)appendImageFromPHAssets:(NSArray<PHAsset *> *)assets toImages:(NSMutableArray<UIImage *> *)images;
 
 + (CGSize)sizeFromPHAsset:(PHAsset *)asset;
 

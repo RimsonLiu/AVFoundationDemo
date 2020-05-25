@@ -104,7 +104,6 @@
 }
 
 - (void)beginMerge {
-    [self showLoadingView];
     NSTimeInterval timeStart = [[NSDate date] timeIntervalSince1970];
     __weak typeof(self) weakSelf = self;
     [MediaUtil createVideoFromImages:self.chosenImages size:self.assetSize completion:^{
@@ -113,6 +112,7 @@
         [strongSelf initAVPlayer];
         NSTimeInterval timeEnd = [[NSDate date] timeIntervalSince1970];
         NSLog(@"共耗时 %f", timeEnd - timeStart);
+        [strongSelf.chosenImages removeAllObjects];
     }];
 }
 
@@ -151,12 +151,16 @@
     if (!self.chosenImages) {
         self.chosenImages = [[NSMutableArray alloc] init];
     }
-    [self.chosenImages removeAllObjects];
-    for (int i = 0; i < assets.count; i++) {
-        UIImage *image = [MediaUtil imageFromPHAsset:assets[i] inSize:self.assetSize];
-        image = [MediaUtil imageResizedFrom:image toSize:self.assetSize];
-        [self.chosenImages addObject:image];
-    }
+    
+//    for (PHAsset *asset in assets) {
+//        UIImage *image = [MediaUtil imageFromPHAsset:asset];
+//        image = [MediaUtil imageResizedFrom:image toSize:self.assetSize];
+//        [self.chosenImages addObject:image];
+//    }
+    
+    [MediaUtil appendImageFromPHAssets:assets toImages:self.chosenImages];
+    
+    [self showLoadingView];
     [self beginMerge];
 }
 
