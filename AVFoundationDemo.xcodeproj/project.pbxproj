@@ -15,29 +15,10 @@
 		D317CF0124517CDD0052FB4E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D317CF0024517CDD0052FB4E /* Assets.xcassets */; };
 		D317CF0424517CDD0052FB4E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D317CF0224517CDD0052FB4E /* LaunchScreen.storyboard */; };
 		D317CF0724517CDD0052FB4E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF0624517CDD0052FB4E /* main.m */; };
-		D317CF1124517CDD0052FB4E /* AVFoundationDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF1024517CDD0052FB4E /* AVFoundationDemoTests.m */; };
-		D317CF1C24517CDD0052FB4E /* AVFoundationDemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF1B24517CDD0052FB4E /* AVFoundationDemoUITests.m */; };
 		D317CF7824548E830052FB4E /* FileUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF7724548E830052FB4E /* FileUtil.m */; };
 		D317CF7C245491E90052FB4E /* MediaUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D317CF7B245491E90052FB4E /* MediaUtil.m */; };
 		D3BAF5FB2473915300E46E90 /* CAAnimationUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D3BAF5FA2473915300E46E90 /* CAAnimationUtil.m */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		D317CF0D24517CDD0052FB4E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D317CEE924517CDB0052FB4E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D317CEF024517CDB0052FB4E;
-			remoteInfo = AVFoundationDemo;
-		};
-		D317CF1824517CDD0052FB4E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D317CEE924517CDB0052FB4E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D317CEF024517CDB0052FB4E;
-			remoteInfo = AVFoundationDemo;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		16BDF04494954D5E576817F8 /* Pods-AVFoundationDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVFoundationDemo.release.xcconfig"; path = "Target Support Files/Pods-AVFoundationDemo/Pods-AVFoundationDemo.release.xcconfig"; sourceTree = "<group>"; };
@@ -55,12 +36,6 @@
 		D317CF0324517CDD0052FB4E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D317CF0524517CDD0052FB4E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D317CF0624517CDD0052FB4E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		D317CF0C24517CDD0052FB4E /* AVFoundationDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVFoundationDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D317CF1024517CDD0052FB4E /* AVFoundationDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AVFoundationDemoTests.m; sourceTree = "<group>"; };
-		D317CF1224517CDD0052FB4E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D317CF1724517CDD0052FB4E /* AVFoundationDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AVFoundationDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D317CF1B24517CDD0052FB4E /* AVFoundationDemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AVFoundationDemoUITests.m; sourceTree = "<group>"; };
-		D317CF1D24517CDD0052FB4E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D317CF722451A9770052FB4E /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		D317CF7624548E830052FB4E /* FileUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileUtil.h; sourceTree = "<group>"; };
 		D317CF7724548E830052FB4E /* FileUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileUtil.m; sourceTree = "<group>"; };
@@ -76,20 +51,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA4F21DC1E1B17F74ED1B52A /* libPods-AVFoundationDemo.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D317CF0924517CDD0052FB4E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D317CF1424517CDD0052FB4E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,8 +79,6 @@
 			isa = PBXGroup;
 			children = (
 				D317CEF324517CDB0052FB4E /* AVFoundationDemo */,
-				D317CF0F24517CDD0052FB4E /* AVFoundationDemoTests */,
-				D317CF1A24517CDD0052FB4E /* AVFoundationDemoUITests */,
 				D317CEF224517CDB0052FB4E /* Products */,
 				C0DD37FE7FC1C9E5DD38DE92 /* Pods */,
 				454BDE69BEDF90372B4C1CCF /* Frameworks */,
@@ -130,8 +89,6 @@
 			isa = PBXGroup;
 			children = (
 				D317CEF124517CDB0052FB4E /* AVFoundationDemo.app */,
-				D317CF0C24517CDD0052FB4E /* AVFoundationDemoTests.xctest */,
-				D317CF1724517CDD0052FB4E /* AVFoundationDemoUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -151,24 +108,6 @@
 				D317CF0524517CDD0052FB4E /* Info.plist */,
 			);
 			path = AVFoundationDemo;
-			sourceTree = "<group>";
-		};
-		D317CF0F24517CDD0052FB4E /* AVFoundationDemoTests */ = {
-			isa = PBXGroup;
-			children = (
-				D317CF1024517CDD0052FB4E /* AVFoundationDemoTests.m */,
-				D317CF1224517CDD0052FB4E /* Info.plist */,
-			);
-			path = AVFoundationDemoTests;
-			sourceTree = "<group>";
-		};
-		D317CF1A24517CDD0052FB4E /* AVFoundationDemoUITests */ = {
-			isa = PBXGroup;
-			children = (
-				D317CF1B24517CDD0052FB4E /* AVFoundationDemoUITests.m */,
-				D317CF1D24517CDD0052FB4E /* Info.plist */,
-			);
-			path = AVFoundationDemoUITests;
 			sourceTree = "<group>";
 		};
 		D317CF2924517F810052FB4E /* Supporting Files */ = {
@@ -232,42 +171,6 @@
 			productReference = D317CEF124517CDB0052FB4E /* AVFoundationDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D317CF0B24517CDD0052FB4E /* AVFoundationDemoTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D317CF2324517CDD0052FB4E /* Build configuration list for PBXNativeTarget "AVFoundationDemoTests" */;
-			buildPhases = (
-				D317CF0824517CDD0052FB4E /* Sources */,
-				D317CF0924517CDD0052FB4E /* Frameworks */,
-				D317CF0A24517CDD0052FB4E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D317CF0E24517CDD0052FB4E /* PBXTargetDependency */,
-			);
-			name = AVFoundationDemoTests;
-			productName = AVFoundationDemoTests;
-			productReference = D317CF0C24517CDD0052FB4E /* AVFoundationDemoTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		D317CF1624517CDD0052FB4E /* AVFoundationDemoUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D317CF2624517CDD0052FB4E /* Build configuration list for PBXNativeTarget "AVFoundationDemoUITests" */;
-			buildPhases = (
-				D317CF1324517CDD0052FB4E /* Sources */,
-				D317CF1424517CDD0052FB4E /* Frameworks */,
-				D317CF1524517CDD0052FB4E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D317CF1924517CDD0052FB4E /* PBXTargetDependency */,
-			);
-			name = AVFoundationDemoUITests;
-			productName = AVFoundationDemoUITests;
-			productReference = D317CF1724517CDD0052FB4E /* AVFoundationDemoUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -279,14 +182,6 @@
 				TargetAttributes = {
 					D317CEF024517CDB0052FB4E = {
 						CreatedOnToolsVersion = 11.4.1;
-					};
-					D317CF0B24517CDD0052FB4E = {
-						CreatedOnToolsVersion = 11.4.1;
-						TestTargetID = D317CEF024517CDB0052FB4E;
-					};
-					D317CF1624517CDD0052FB4E = {
-						CreatedOnToolsVersion = 11.4.1;
-						TestTargetID = D317CEF024517CDB0052FB4E;
 					};
 				};
 			};
@@ -304,8 +199,6 @@
 			projectRoot = "";
 			targets = (
 				D317CEF024517CDB0052FB4E /* AVFoundationDemo */,
-				D317CF0B24517CDD0052FB4E /* AVFoundationDemoTests */,
-				D317CF1624517CDD0052FB4E /* AVFoundationDemoUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -318,20 +211,6 @@
 				D317CF0424517CDD0052FB4E /* LaunchScreen.storyboard in Resources */,
 				D317CF0124517CDD0052FB4E /* Assets.xcassets in Resources */,
 				D317CEFF24517CDB0052FB4E /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D317CF0A24517CDD0052FB4E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D317CF1524517CDD0052FB4E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,36 +273,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D317CF0824517CDD0052FB4E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D317CF1124517CDD0052FB4E /* AVFoundationDemoTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D317CF1324517CDD0052FB4E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D317CF1C24517CDD0052FB4E /* AVFoundationDemoUITests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		D317CF0E24517CDD0052FB4E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D317CEF024517CDB0052FB4E /* AVFoundationDemo */;
-			targetProxy = D317CF0D24517CDD0052FB4E /* PBXContainerItemProxy */;
-		};
-		D317CF1924517CDD0052FB4E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D317CEF024517CDB0052FB4E /* AVFoundationDemo */;
-			targetProxy = D317CF1824517CDD0052FB4E /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D317CEFD24517CDB0052FB4E /* Main.storyboard */ = {
@@ -561,7 +411,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = F8AD67RHCY;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AVFoundationDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -579,7 +429,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = F8AD67RHCY;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AVFoundationDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -588,82 +438,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.rimson.AVFoundationDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		D317CF2424517CDD0052FB4E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = F8AD67RHCY;
-				INFOPLIST_FILE = AVFoundationDemoTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = rimson.AVFoundationDemoTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AVFoundationDemo.app/AVFoundationDemo";
-			};
-			name = Debug;
-		};
-		D317CF2524517CDD0052FB4E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = F8AD67RHCY;
-				INFOPLIST_FILE = AVFoundationDemoTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = rimson.AVFoundationDemoTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AVFoundationDemo.app/AVFoundationDemo";
-			};
-			name = Release;
-		};
-		D317CF2724517CDD0052FB4E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = F8AD67RHCY;
-				INFOPLIST_FILE = AVFoundationDemoUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = rimson.AVFoundationDemoUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = AVFoundationDemo;
-			};
-			name = Debug;
-		};
-		D317CF2824517CDD0052FB4E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = F8AD67RHCY;
-				INFOPLIST_FILE = AVFoundationDemoUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = rimson.AVFoundationDemoUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = AVFoundationDemo;
 			};
 			name = Release;
 		};
@@ -684,24 +458,6 @@
 			buildConfigurations = (
 				D317CF2124517CDD0052FB4E /* Debug */,
 				D317CF2224517CDD0052FB4E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D317CF2324517CDD0052FB4E /* Build configuration list for PBXNativeTarget "AVFoundationDemoTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D317CF2424517CDD0052FB4E /* Debug */,
-				D317CF2524517CDD0052FB4E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D317CF2624517CDD0052FB4E /* Build configuration list for PBXNativeTarget "AVFoundationDemoUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D317CF2724517CDD0052FB4E /* Debug */,
-				D317CF2824517CDD0052FB4E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
